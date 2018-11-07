@@ -1,0 +1,5 @@
+tester
+testing
+*.o
+a.out
+*.txt
