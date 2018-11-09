@@ -52,7 +52,7 @@ void displayTNODE(TNODE *n, FILE *fp) {
     fprintf(fp, "&%p", n->value);
   }
   if (n->debug > 0) {
-    fprintf(fp, "&%p", n->value);
+    fprintf(fp, "&%p", n);
   }
 }
 

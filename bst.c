@@ -63,7 +63,7 @@ static void insertBSTinternal(BST *t, TNODE *new) {
 TNODE *insertBST(BST *t, void *value) {
   TNODE *node = newTNODE(value, 0, 0, 0);
   assert(node != 0);
-  setTNODEparent(node, node);
+  // setTNODEparent(node, node);
   if (t->size == 0) setBSTroot(t, node);
   else insertBSTinternal(t, node);
   t->size++;

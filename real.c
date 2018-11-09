@@ -38,7 +38,7 @@ displayREAL(void *v, FILE *fp)
     fprintf(fp,"%f",getREAL(v));
     }
     
-double 
+int 
 compareREAL(void *v,void *w)
     {
     return (int)getREAL(v) - (int)getREAL(w);

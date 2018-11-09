@@ -1,4 +1,4 @@
-OBJS =  integer.o real.o string.o scanner.o bst.o tnode.o queue.o cda.o
+OBJS =  integer.o real.o string.o scanner.o gst.o bst.o tnode.o queue.o cda.o
 # MAIN = amaze
 OOPTS = -Wall -Wextra -g -std=c99 -c
 LOPTS = -Wall -Wextra -g -std=c99
@@ -24,13 +24,16 @@ valgrind : all $(TESTS)
 	done
 
 $(TESTS): %: $(TESTDIR)%.c all
-	gcc -Wall -Wextra -g -o $(TESTDIR)$@ $< $(OBJS)
+	gcc $(LOPTS) -o $(TESTDIR)$@ $< $(OBJS)
 
 tnode.o : tnode.c tnode.h
 	gcc $(OOPTS) tnode.c
 
 bst.o : bst.c bst.h tnode.o queue.o
 	gcc $(OOPTS) bst.c
+	
+gst.o : gst.c gst.h bst.o tnode.o queue.o
+	gcc $(OOPTS) gst.c
 
 scanner.o : scanner.c scanner.h
 	gcc $(OOPTS) scanner.c
@@ -45,4 +48,4 @@ cda.o : cda.c cda.h
 	gcc $(OOPTS) cda.c
 
 clean	:
-		rm -f $(OBJS) $(MAIN)
+		rm -f $(OBJS) $(MAIN) *.o
