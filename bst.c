@@ -40,7 +40,10 @@ void setBSTfree(BST *t, void (*f)(void *)) { t->release = f; }
 
 TNODE *getBSTroot(BST *t) { return t->root; }
 
-void setBSTroot(BST *t, TNODE *replacement) { t->root = replacement; setTNODEparent(t->root, t->root); }
+void setBSTroot(BST *t, TNODE *replacement) {
+  t->root = replacement;
+  setTNODEparent(t->root, t->root);
+}
 
 void setBSTsize(BST *t, int s) { t->size = s; }
 
@@ -92,6 +95,7 @@ int deleteBST(BST *t, void *key) {
   if (node == 0) return -1;
   TNODE *leaf = swapToLeafBST(t, node);
   pruneLeafBST(t, leaf);
+  free(leaf);
   t->size--;
   if (t->size == 0) t->root = 0;
   return 0;
@@ -135,10 +139,9 @@ void pruneLeafBST(BST *t, TNODE *leaf) {
   if (parent != 0 && parent != leaf) {
     if (getTNODEleft(parent) == leaf) setTNODEleft(parent, 0);
     else if (getTNODEright(parent) == leaf) setTNODEright(parent, 0);
-  } else {
+  } else if (parent == leaf) {
     t->root = 0;
   }
-  free(leaf);
 }
 
 int sizeBST(BST *t) { return t->size; }

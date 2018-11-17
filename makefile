@@ -1,4 +1,4 @@
-OBJS =  integer.o real.o string.o scanner.o gst.o bst.o tnode.o queue.o cda.o
+OBJS =  integer.o real.o string.o scanner.o rbt.o gst.o bst.o tnode.o queue.o cda.o
 # MAIN = amaze
 OOPTS = -Wall -Wextra -g -std=c99 -c
 LOPTS = -Wall -Wextra -g -std=c99
@@ -9,7 +9,16 @@ all : $(OBJS)
 	cp -f *.o $(TESTDIR)
 	cp -f *.h $(TESTDIR)
 
-test : all $(TESTS)
+copy :
+	cp -f ../objects/tnode.o .
+	cp -f ../objects/bst.o .
+	cp -f ../objects/gst.o .
+	cp -f ../objects/rbt.o .
+
+test: all
+	gcc $(LOPTS) -o test $(OBJS) test2.c
+
+tester : all $(TESTS)
 	for x in $(TESTS); do \
 			echo; echo -------; echo $$x.expected; echo -------; cat $(TESTDIR)$$x.expected; \
 			./$(TESTDIR)$$x > $(TESTDIR)$$x.yours; \
@@ -32,8 +41,11 @@ tnode.o : tnode.c tnode.h
 bst.o : bst.c bst.h tnode.o queue.o
 	gcc $(OOPTS) bst.c
 	
-gst.o : gst.c gst.h bst.o tnode.o queue.o
+gst.o : gst.c gst.h bst.o
 	gcc $(OOPTS) gst.c
+
+rbt.o : rbt.c rbt.h gst.o
+	gcc $(OOPTS) rbt.c
 
 scanner.o : scanner.c scanner.h
 	gcc $(OOPTS) scanner.c

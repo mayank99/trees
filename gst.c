@@ -5,11 +5,11 @@
 #include "bst.h"
 
 struct gst {
-  TNODE *root;
+  // TNODE *root;
   BST *bst;
   int size;
   int insertions;
-  int debug;
+  // int debug;
   int (*compare)(void *, void *);
   void (*display)(void *, FILE *);
   void (*swap)(TNODE *, TNODE *);
@@ -35,7 +35,7 @@ GSTVAL *newGSTVAL(GST *t, void *v) {
   return n;
 }
 
-static void swap(TNODE *a, TNODE *b) {
+static void swapGSTVAL(TNODE *a, TNODE *b) {
   void *x = getTNODEvalue(a);
   void *y = getTNODEvalue(b);
   setTNODEvalue(a, y);
@@ -66,19 +66,23 @@ GST *newGST(int (*c)(void *, void *)) {
   t->compare = c;
   t->size = 0;
   t->insertions = 0;
-  t->root = 0;
-  t->debug = 0;
+  // t->root = 0;
+  // t->debug = 0;
   t->display = 0;
-  t->swap = swap;
+  t->swap = swapGSTVAL;
   t->release = 0;
   t->bst = newBST(compareGSTVAL);
   setBSTdisplay(t->bst, displayGSTVAL);
+  setBSTfree(t->bst, freeGSTVAL);
   return t;
 }
 
 void setGSTdisplay(GST *t, void (*d)(void *, FILE *)) { t->display = d; }
 
-void setGSTswapper(GST *t, void (*s)(TNODE *, TNODE *)) { t->swap = s; }
+void setGSTswapper(GST *t, void (*s)(TNODE *, TNODE *)) {
+  t->swap = s;
+  setBSTswapper(t->bst, s);
+}
 
 void setGSTfree(GST *t, void (*f)(void *)) { t->release = f; }
 
@@ -86,21 +90,21 @@ TNODE *getGSTroot(GST *t) { return getBSTroot(t->bst); }
 
 void setGSTroot(GST *t, TNODE *replacement) { setBSTroot(t->bst, replacement); }
 
-void setGSTsize(GST *t, int s) { t->size = s; }
+void setGSTsize(GST *t, int s) { t->size = s; setBSTsize(t->bst, s); }
 
 TNODE *insertGST(GST *t, void *value) {
   TNODE *n = locateGST(t, value);
+  t->size++;
   if (n) {
     GSTVAL *gstval = getTNODEvalue(n);
     gstval->frequency++;
     if (t->release) t->release(value);
     t->insertions++;
-    return n;
+    return 0;
   } else {
     GSTVAL *val = newGSTVAL(t, value);
     return insertBST(t->bst, val);
   }
-  t->size++;
 }
 
 void *findGST(GST *t, void *key) {
@@ -119,21 +123,28 @@ TNODE *locateGST(GST *t, void *key) {
 
 int deleteGST(GST *t, void *key) {
   TNODE *n = locateGST(t, key);
+  int code = -1;
   if (n) {
     GSTVAL *value = getTNODEvalue(n);
     value->frequency--;
-    if (value->frequency == 0) deleteBST(t->bst, value);
+    code = value->frequency;
+    if (value->frequency == 0) {
+      deleteBST(t->bst, value);
+      free(value);
+    }
     else t->insertions--;
-    return value->frequency;
     t->size--;
-  } else {
-    return -1;
   }
+  return code;
 }
 
 TNODE *swapToLeafGST(GST *t, TNODE *node) { return swapToLeafBST(t->bst, node); }
 
-void pruneLeafGST(GST *t, TNODE *leaf) { pruneLeafBST(t->bst, leaf); }
+void pruneLeafGST(GST *t, TNODE *leaf) { 
+  GSTVAL *gstval = getTNODEvalue(leaf);
+  free(gstval);
+  pruneLeafBST(t->bst, leaf);
+}
 
 int sizeGST(GST *t) { return sizeBST(t->bst); }
 
@@ -153,7 +164,7 @@ void freeGST(GST *t) {
 
 void *unwrapGST(TNODE *n) {
   GSTVAL *value = getTNODEvalue(n);
-  return value->value;
+  return value ? value->value : 0;
 }
 
 int freqGST(GST *t, void *key) {
