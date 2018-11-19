@@ -102,7 +102,10 @@ void setRBTfree(RBT *t, void (*f)(void *)) { t->release = f; }
 
 TNODE *getRBTroot(RBT *t) { return getGSTroot(t->gst); }
 
-void setRBTroot(RBT *t, TNODE *replacement) { setGSTroot(t->gst, replacement); }
+void setRBTroot(RBT *t, TNODE *replacement) {
+	setGSTroot(t->gst, replacement);
+	setTNODEparent(replacement, replacement);
+}
 
 void setRBTsize(RBT *t, int s) {
 	t->size = s;

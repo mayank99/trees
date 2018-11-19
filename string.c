@@ -43,7 +43,7 @@ displaySTRING(void *v,FILE *fp)
 int 
 compareSTRING(void *v,void *w)
     {
-    return strcmp(w, v);
+    return strcmp(getSTRING(v), getSTRING(w));
     }
 
 
